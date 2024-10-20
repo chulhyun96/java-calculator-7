@@ -10,7 +10,7 @@ public class InputParser {
     private final String DEFAULT_DELIMITER_PATTERN = "[,:]";
     private final String CUSTOM_DELIMITER_START_POSITION = "//";
     private final String CUSTOM_DELIMITER_END_POSITION = "\\n";
-    private final String SINGLE_INPUT = "-?\\d+";
+    private final String SINGLE_INPUT_PATTERN = "-?\\d+";
     private final int CUSTOM_DELIMITER_START_INDEX = 2;
     private final int NEWLINE_OFFSET = 2;
 
@@ -46,7 +46,7 @@ public class InputParser {
     }
 
     private boolean isSingleInput(String input) {
-        return input.matches(SINGLE_INPUT);
+        return input.matches(SINGLE_INPUT_PATTERN);
     }
 
     private boolean isStartingWithCustom(String input) {
