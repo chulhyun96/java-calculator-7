@@ -6,16 +6,16 @@ import java.util.regex.Pattern;
 
 public class InputParser {
 
-    private final String COMMON_DELIMITER = ",";
-    private final String DEFAULT_DELIMITER_PATTERN = "[,:]";
-    private final String CUSTOM_DELIMITER_START_POSITION = "//";
-    private final String CUSTOM_DELIMITER_END_POSITION = "\\n";
-    private final String SINGLE_INPUT_PATTERN = "-?\\d+";
-    private final int CUSTOM_DELIMITER_START_INDEX = 2;
-    private final int NEWLINE_OFFSET = 2;
+    private static final String COMMON_DELIMITER = ",";
+    private static final String DEFAULT_DELIMITER_PATTERN = "[,:]";
+    private static final String CUSTOM_DELIMITER_START_POSITION = "//";
+    private static final String CUSTOM_DELIMITER_END_POSITION = "\\n";
+    private static final String SINGLE_INPUT_PATTERN = "-?\\d+";
+    private static final int CUSTOM_DELIMITER_START_INDEX = 2;
+    private static final int OFFSET = 2;
 
     public List<Integer> parseInputToIntList(String input) {
-        if (input.isBlank()) return List.of(0);
+        if (input.isEmpty()) return List.of(0);
 
         if (isSingleInput(input)) return convertToIntList(input);
 
@@ -31,7 +31,7 @@ public class InputParser {
                     delimiterEndIndex
             );
             String numbersPart = input.substring(
-                    delimiterEndIndex + NEWLINE_OFFSET
+                    delimiterEndIndex + OFFSET
             );
             return replaceDelimiterToCommon(numbersPart, customDelimiter);
         }
@@ -57,12 +57,8 @@ public class InputParser {
         return input.indexOf(CUSTOM_DELIMITER_END_POSITION);
     }
 
-    private List<String> splitByCommonDelimiter(String input) {
-        return Arrays.stream(input.split(COMMON_DELIMITER)).toList();
-    }
-
     private List<Integer> convertToIntList(String input) {
-        return splitByCommonDelimiter(input).stream()
+        return Arrays.stream(input.split(COMMON_DELIMITER))
                 .map(Validator::validateIfNotNumber)
                 .map(Validator::validateIfInputNegative)
                 .toList();

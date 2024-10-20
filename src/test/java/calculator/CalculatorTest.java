@@ -114,9 +114,6 @@ class CalculatorTest {
                 () -> assertEquals(606, result2),
                 () -> assertEquals(6066, result3)
         );
-        assertEquals(60, result1);
-        assertEquals(606, result2);
-        assertEquals(6066, result3);
     }
     @Test
     void inputNegative() {
