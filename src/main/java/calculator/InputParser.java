@@ -1,9 +1,8 @@
 package calculator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class InputParser {
@@ -15,6 +14,9 @@ public class InputParser {
     private static final String SINGLE_INPUT_PATTERN = "-?\\d+";
     private static final int CUSTOM_DELIMITER_START_INDEX = 2;
     private static final int OFFSET = 2;
+
+    private String delimiter;
+    private String numbers;
 
 
     public List<Integer> parseInputToIntList(String input) {
@@ -29,26 +31,27 @@ public class InputParser {
     private String standardizeDelimiters(String input) {
         if (isStartingWithCustom(input)) {
             int delimiterEndIndex = findDelimiterEndIndex(input);
-            Map<String, String> substring = getDelimiterAndNumbers(input, delimiterEndIndex);
-            return replaceDelimiterToCommon(substring.get("numbers"), substring.get("delimiter"));
+            setDelimiterAndNumbers(input, delimiterEndIndex);
+            return replaceDelimiterToCommon(this.numbers, this.delimiter);
         }
         return replaceDelimiterToCommon(input, DEFAULT_DELIMITER_PATTERN);
     }
 
-    private Map<String,String> getDelimiterAndNumbers(String input, int delimiterEndIndex) {
-        HashMap<String, String> map = new HashMap<>();
-        String delimiter = input.substring(CUSTOM_DELIMITER_START_INDEX, delimiterEndIndex);
-        String numbersPart = input.substring(delimiterEndIndex + OFFSET);
-        map.put("delimiter", delimiter);
-        map.put("numbers", numbersPart);
-        return map;
+    private boolean isStartingWithCustom(String input) {
+        return input.startsWith(CUSTOM_DELIMITER_START_POSITION);
     }
 
-    private List<Integer> convertToIntList(String input) {
-        return Arrays.stream(input.split(COMMON_DELIMITER)) // 1,2,3 -> "1","2","3"
-                .map(Validator::validateIfNotNumber)
-                .map(Validator::validateIfInputNegative)
-                .toList();
+    private boolean isSingleInput(String input) {
+        return input.matches(SINGLE_INPUT_PATTERN);
+    }
+
+    private int findDelimiterEndIndex(String input) {
+        return input.indexOf(CUSTOM_DELIMITER_END_POSITION);
+    }
+
+    private void setDelimiterAndNumbers(String input, int delimiterEndIndex) {
+        this.delimiter = input.substring(CUSTOM_DELIMITER_START_INDEX, delimiterEndIndex);
+        this.numbers = input.substring(delimiterEndIndex + OFFSET);
     }
 
     private String replaceDelimiterToCommon(String input, String delimiter) {
@@ -58,15 +61,10 @@ public class InputParser {
         return input.replaceAll(Pattern.quote(delimiter), COMMON_DELIMITER);
     }
 
-    private boolean isSingleInput(String input) {
-        return input.matches(SINGLE_INPUT_PATTERN);
-    }
-
-    private boolean isStartingWithCustom(String input) {
-        return input.startsWith(CUSTOM_DELIMITER_START_POSITION);
-    }
-
-    private int findDelimiterEndIndex(String input) {
-        return input.indexOf(CUSTOM_DELIMITER_END_POSITION);
+    private List<Integer> convertToIntList(String input) {
+        return Arrays.stream(input.split(COMMON_DELIMITER))
+                .map(Validator::validateIfNotNumber)
+                .map(Validator::validateIfInputNegative)
+                .toList();
     }
 }
