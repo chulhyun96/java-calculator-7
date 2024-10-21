@@ -17,5 +17,4 @@ class ValidatorTest {
             Validator.validateIfNotNumber("@");
         });
     }
-
 }

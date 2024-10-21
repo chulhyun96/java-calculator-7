@@ -1,7 +1,9 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class InputParser {
@@ -14,28 +16,39 @@ public class InputParser {
     private static final int CUSTOM_DELIMITER_START_INDEX = 2;
     private static final int OFFSET = 2;
 
+
     public List<Integer> parseInputToIntList(String input) {
         if (input.isEmpty()) return List.of(0);
 
         if (isSingleInput(input)) return convertToIntList(input);
 
-        String standardizedInput = standardizeDelimiters(input);
-        return convertToIntList(standardizedInput);
+        String standardInput = standardizeDelimiters(input);
+        return convertToIntList(standardInput);
     }
 
     private String standardizeDelimiters(String input) {
         if (isStartingWithCustom(input)) {
             int delimiterEndIndex = findDelimiterEndIndex(input);
-            String customDelimiter = input.substring(
-                    CUSTOM_DELIMITER_START_INDEX,
-                    delimiterEndIndex
-            );
-            String numbersPart = input.substring(
-                    delimiterEndIndex + OFFSET
-            );
-            return replaceDelimiterToCommon(numbersPart, customDelimiter);
+            Map<String, String> substring = getDelimiterAndNumbers(input, delimiterEndIndex);
+            return replaceDelimiterToCommon(substring.get("numbers"), substring.get("delimiter"));
         }
         return replaceDelimiterToCommon(input, DEFAULT_DELIMITER_PATTERN);
+    }
+
+    private Map<String,String> getDelimiterAndNumbers(String input, int delimiterEndIndex) {
+        HashMap<String, String> map = new HashMap<>();
+        String delimiter = input.substring(CUSTOM_DELIMITER_START_INDEX, delimiterEndIndex);
+        String numbersPart = input.substring(delimiterEndIndex + OFFSET);
+        map.put("delimiter", delimiter);
+        map.put("numbers", numbersPart);
+        return map;
+    }
+
+    private List<Integer> convertToIntList(String input) {
+        return Arrays.stream(input.split(COMMON_DELIMITER)) // 1,2,3 -> "1","2","3"
+                .map(Validator::validateIfNotNumber)
+                .map(Validator::validateIfInputNegative)
+                .toList();
     }
 
     private String replaceDelimiterToCommon(String input, String delimiter) {
@@ -55,12 +68,5 @@ public class InputParser {
 
     private int findDelimiterEndIndex(String input) {
         return input.indexOf(CUSTOM_DELIMITER_END_POSITION);
-    }
-
-    private List<Integer> convertToIntList(String input) {
-        return Arrays.stream(input.split(COMMON_DELIMITER))
-                .map(Validator::validateIfNotNumber)
-                .map(Validator::validateIfInputNegative)
-                .toList();
     }
 }
